@@ -1,6 +1,7 @@
-use ra_db::{CrateId, Cancelable};
+use ra_db::{CrateId, Cancelable, FileId};
+use ra_syntax::ast;
 
-use crate::{Name, db::HirDatabase, DefId};
+use crate::{Name, db::HirDatabase, DefId, HirFileId};
 
 /// hir::Crate describes a single crate. It's the main inteface with which
 /// crate's dependencies interact. Mostly, it should be just a proxy for the
@@ -17,6 +18,9 @@ pub struct CrateDependency {
 }
 
 impl Crate {
+    pub fn crate_id(&self) -> CrateId {
+        self.crate_id
+    }
     pub fn dependencies(&self, db: &impl HirDatabase) -> Vec<CrateDependency> {
         self.dependencies_impl(db)
     }
@@ -31,6 +35,10 @@ pub struct Module {
 }
 
 impl Module {
+    pub fn source(&self, db: &impl HirDatabase) -> (FileId, Option<ast::ModuleNode>) {
+        self.source_impl(db)
+    }
+
     /// Returns the crate this module is part of.
     pub fn krate(&self, db: &impl HirDatabase) -> Cancelable<Option<Crate>> {
         self.krate_impl(db)
